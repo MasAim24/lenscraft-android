@@ -5,9 +5,9 @@ const distDir = path.join(process.cwd(), 'dist');
 fs.mkdirSync(distDir, { recursive: true });
 
 // ---------------------------------------------------------------------------
-// 1. styles.css — Scalable Token System (60-30-10 Hierarchy & Optical Balance)
+// 1. styles.css — Zero-Blur GPU Composited UI (No backdrop-filter lag!)
 // ---------------------------------------------------------------------------
-const stylesCss = `/* LensCraft Pro Camera — Semantic Design Tokens & 60-30-10 Hierarchy */
+const stylesCss = `/* LensCraft Pro Camera v1.1 — High-FPS Hardware-Accelerated UI */
 :root {
   color-scheme: dark;
 
@@ -28,27 +28,21 @@ const stylesCss = `/* LensCraft Pro Camera — Semantic Design Tokens & 60-30-10
   /* Primitive Scale — Leica Gold & Shutter Crimson (10% Intentional Accent) */
   --amber-400: #fbbf24;
   --amber-500: #f59e0b;
-  --amber-600: #d97706;
   --crimson-500: #ef4444;
   --emerald-400: #34d399;
-  --emerald-500: #10b981;
 
-  /* Semantic Tokens */
+  /* Semantic Tokens (Solid/Translucent without expensive backdrop-filter) */
   --bg-surface: var(--obsidian-950);
   --bg-elevated: var(--obsidian-900);
-  --bg-panel: rgba(18, 21, 27, 0.88);
-  --bg-pill: rgba(24, 28, 36, 0.86);
+  --bg-pill: rgba(14, 17, 22, 0.92);
   --text-primary: var(--silver-100);
   --text-secondary: var(--silver-400);
-  --text-muted: var(--silver-500);
   --border-subtle: rgba(255, 255, 255, 0.09);
   --border-active: rgba(251, 191, 36, 0.55);
   --brand-primary: var(--amber-400);
-  --brand-primary-strong: var(--amber-500);
   --status-shutter: var(--crimson-500);
   --status-focus: var(--emerald-400);
 
-  /* Safe Area & Layout */
   --top-safe: 0px;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Roboto Mono', ui-monospace, monospace;
@@ -92,7 +86,7 @@ html, body {
   background: var(--bg-elevated);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 20;
-  min-height: 54px;
+  min-height: 52px;
   gap: 8px;
 }
 
@@ -103,11 +97,10 @@ html, body {
 }
 
 .leica-dot {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--status-shutter);
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.65);
   flex-shrink: 0;
 }
 
@@ -147,8 +140,8 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  height: 32px;
-  padding: 0 10px;
+  height: 30px;
+  padding: 0 9px;
   border-radius: 6px;
   background: var(--obsidian-800);
   border: 1px solid var(--border-subtle);
@@ -157,7 +150,6 @@ html, body {
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
   white-space: nowrap;
 }
 
@@ -165,10 +157,6 @@ html, body {
   background: rgba(251, 191, 36, 0.16);
   color: var(--brand-primary);
   border-color: var(--border-active);
-}
-
-.hud-btn:active {
-  transform: scale(0.95);
 }
 
 /* ---------------- VIEWFINDER STAGE ---------------- */
@@ -180,6 +168,7 @@ html, body {
   justify-content: center;
   background: #040507;
   overflow: hidden;
+  contain: strict;
 }
 
 .viewfinder-frame {
@@ -190,7 +179,6 @@ html, body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: aspect-ratio 0.22s ease;
 }
 
 #live-video {
@@ -208,6 +196,7 @@ html, body {
   height: 100%;
   object-fit: contain;
   display: block;
+  will-change: contents;
 }
 
 /* Aspect-Ratio Crop Masks */
@@ -224,9 +213,8 @@ html, body {
   position: relative;
   width: 100%;
   height: 100%;
-  box-shadow: 0 0 0 9999px rgba(4, 5, 7, 0.78);
+  box-shadow: 0 0 0 9999px rgba(4, 5, 7, 0.80);
   border: 1px solid rgba(255, 255, 255, 0.24);
-  transition: width 0.2s ease, height 0.2s ease;
 }
 
 /* Grid Overlays inside Crop Box */
@@ -311,6 +299,7 @@ html, body {
   align-items: center;
   justify-content: space-between;
   opacity: 0.85;
+  will-change: transform;
 }
 .horizon-level.hidden {
   display: none;
@@ -319,8 +308,6 @@ html, body {
   width: 42px;
   height: 2px;
   background: rgba(255, 255, 255, 0.65);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-  transition: background 0.15s ease;
 }
 .horizon-center-ring {
   width: 16px;
@@ -330,13 +317,12 @@ html, body {
 }
 .horizon-level.level-locked .horizon-wing {
   background: var(--status-focus);
-  box-shadow: 0 0 8px rgba(52, 211, 153, 0.8);
 }
 .horizon-level.level-locked .horizon-center-ring {
   border-color: var(--status-focus);
 }
 
-/* Live RGB Histogram & Telemetry Overlay */
+/* Live RGB Histogram & Telemetry Overlay (Zero backdrop-filter) */
 .telemetry-overlay-top {
   position: absolute;
   top: 10px;
@@ -350,8 +336,7 @@ html, body {
 }
 
 .exif-live-pill {
-  background: rgba(10, 12, 16, 0.78);
-  backdrop-filter: blur(8px);
+  background: var(--bg-pill);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 6px 10px;
@@ -359,7 +344,6 @@ html, body {
   font-size: 11px;
   line-height: 1.45;
   color: var(--text-primary);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
 .exif-live-pill .sub {
@@ -368,23 +352,21 @@ html, body {
 }
 
 .histogram-box {
-  background: rgba(10, 12, 16, 0.8);
-  backdrop-filter: blur(8px);
+  background: var(--bg-pill);
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   padding: 5px 6px 3px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 .histogram-box.hidden {
   display: none;
 }
 
 #histogram-canvas {
-  width: 108px;
-  height: 44px;
+  width: 104px;
+  height: 40px;
   display: block;
 }
 
@@ -399,29 +381,21 @@ html, body {
 /* Tap-to-Focus Reticle */
 .focus-reticle {
   position: absolute;
-  width: 68px;
-  height: 68px;
+  width: 66px;
+  height: 66px;
   border: 1.5px solid var(--brand-primary);
   border-radius: 4px;
-  transform: translate(-50%, -50%) scale(1);
+  transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 15;
   opacity: 0;
-  transition: opacity 0.25s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.15s ease;
-  box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+  transition: opacity 0.2s ease, border-color 0.15s ease;
 }
 .focus-reticle.active {
   opacity: 1;
 }
 .focus-reticle.locked {
   border-color: var(--status-focus);
-  box-shadow: 0 0 12px rgba(52, 211, 153, 0.45);
-}
-.focus-reticle::before,
-.focus-reticle::after {
-  content: '';
-  position: absolute;
-  background: currentColor;
 }
 .focus-reticle-label {
   position: absolute;
@@ -432,7 +406,7 @@ html, body {
   font-size: 9px;
   font-weight: 700;
   color: var(--brand-primary);
-  background: rgba(7, 8, 10, 0.85);
+  background: rgba(7, 8, 10, 0.9);
   padding: 1px 5px;
   border-radius: 3px;
   white-space: nowrap;
@@ -446,13 +420,13 @@ html, body {
   opacity: 0;
   pointer-events: none;
   z-index: 25;
-  transition: opacity 0.08s ease;
+  transition: opacity 0.06s ease;
 }
 .shutter-curtain.fired {
-  opacity: 0.92;
+  opacity: 0.9;
 }
 
-/* Multi-Lens Floating Pill Inside Bottom of Viewfinder */
+/* Multi-Lens Floating Pill */
 .lens-bar-wrap {
   position: absolute;
   bottom: 12px;
@@ -462,12 +436,10 @@ html, body {
   align-items: center;
   gap: 6px;
   background: var(--bg-pill);
-  backdrop-filter: blur(12px);
   padding: 5px 8px;
   border-radius: 999px;
   border: 1px solid var(--border-subtle);
   z-index: 16;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.55);
 }
 
 .lens-btn {
@@ -482,13 +454,11 @@ html, body {
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 
 .lens-btn.active {
   background: var(--brand-primary);
   color: var(--obsidian-950);
-  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
 }
 
 /* ---------------- PRO MANUAL DIALS & FILM STOCK DECK ---------------- */
@@ -501,9 +471,8 @@ html, body {
   padding-bottom: env(safe-area-inset-bottom, 8px);
 }
 
-/* Sub-panel drawer (Film Simulation / Manual Sliders / Frame Style) */
 .drawer-panel {
-  padding: 10px 14px;
+  padding: 9px 14px;
   background: var(--obsidian-850);
   border-bottom: 1px solid var(--border-subtle);
   display: none;
@@ -536,7 +505,6 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 3px;
-  transition: all 0.15s ease;
 }
 .film-card.active {
   border-color: var(--brand-primary);
@@ -567,19 +535,17 @@ html, body {
   text-overflow: ellipsis;
 }
 
-/* Character Sliders inside Film Drawer */
 .character-sliders {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  padding-top: 4px;
 }
 .mini-slider-group {
   display: flex;
   flex-direction: column;
   gap: 3px;
   background: var(--obsidian-800);
-  padding: 6px 8px;
+  padding: 5px 8px;
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
 }
@@ -614,7 +580,6 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   border: 2px solid var(--obsidian-950);
 }
 
-/* Tactile Manual Dial Strip (ISO, SHUTTER, EV, WB, FOCUS, FILM) */
 .manual-strip {
   display: grid;
   grid-template-columns: repeat(6, 1fr);
@@ -633,7 +598,6 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   background: var(--obsidian-800);
   border: 1px solid var(--border-subtle);
   cursor: pointer;
-  transition: all 0.15s ease;
 }
 .dial-pill.active {
   border-color: var(--brand-primary);
@@ -657,7 +621,6 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   color: var(--brand-primary);
 }
 
-/* Discrete Value Selector Bar when a Manual Dial is active */
 .value-wheel-bar {
   display: flex;
   align-items: center;
@@ -697,7 +660,7 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  padding: 12px 22px 14px;
+  padding: 10px 22px 12px;
   gap: 16px;
 }
 
@@ -716,8 +679,8 @@ input[type="range"].pro-range::-webkit-slider-thumb {
 
 .thumb-well {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 48px;
+  height: 48px;
   border-radius: 10px;
   background: var(--obsidian-800);
   border: 1.5px solid var(--border-subtle);
@@ -736,7 +699,7 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   position: absolute;
   bottom: 2px;
   right: 2px;
-  background: rgba(7, 8, 10, 0.85);
+  background: rgba(7, 8, 10, 0.88);
   color: var(--brand-primary);
   font-family: var(--font-mono);
   font-size: 9px;
@@ -746,8 +709,8 @@ input[type="range"].pro-range::-webkit-slider-thumb {
 }
 
 .round-action-btn {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--obsidian-800);
   border: 1px solid var(--border-subtle);
@@ -756,10 +719,6 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.15s ease;
-}
-.round-action-btn:active {
-  transform: scale(0.92);
 }
 .round-action-btn.active {
   border-color: var(--brand-primary);
@@ -767,10 +726,9 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   background: rgba(251, 191, 36, 0.14);
 }
 
-/* Optical Overshoot Mechanical Shutter Button */
 .shutter-outer {
-  width: 76px;
-  height: 76px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   padding: 5px;
   background: transparent;
@@ -779,11 +737,9 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.1s ease, border-color 0.15s ease;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 .shutter-outer:active {
-  transform: scale(0.93);
+  transform: scale(0.94);
   border-color: var(--brand-primary);
 }
 .shutter-inner {
@@ -794,7 +750,6 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 .shutter-inner::after {
   content: '';
@@ -802,15 +757,13 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   height: 14px;
   border-radius: 50%;
   background: var(--status-shutter);
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 /* ---------------- FILM ROLL & LIGHTBOX MODAL ---------------- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(7, 8, 10, 0.96);
-  backdrop-filter: blur(14px);
+  background: #07080a;
   z-index: 60;
   display: none;
   flex-direction: column;
@@ -851,7 +804,6 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   max-height: 62vh;
   object-fit: contain;
   border-radius: 6px;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.75);
   border: 1px solid var(--border-subtle);
 }
 
@@ -903,13 +855,13 @@ input[type="range"].pro-range::-webkit-slider-thumb {
 /* Toast Banner */
 .toast-banner {
   position: fixed;
-  top: calc(var(--top-safe) + 64px);
+  top: calc(var(--top-safe) + 60px);
   left: 50%;
-  transform: translateX(-50%) translateY(-16px);
-  background: rgba(12, 14, 18, 0.94);
+  transform: translateX(-50%);
+  background: #0c0e12;
   border: 1px solid var(--border-active);
   color: var(--text-primary);
-  padding: 9px 14px;
+  padding: 8px 14px;
   border-radius: 999px;
   font-family: var(--font-mono);
   font-size: 11px;
@@ -917,13 +869,11 @@ input[type="range"].pro-range::-webkit-slider-thumb {
   z-index: 90;
   opacity: 0;
   pointer-events: none;
-  transition: all 0.2s ease;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65);
+  transition: opacity 0.15s ease;
   white-space: nowrap;
 }
 .toast-banner.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 `;
 
@@ -943,9 +893,9 @@ const indexHtml = `<!DOCTYPE html>
     <!-- TOP TELEMETRY & HUD CONTROLS -->
     <header class="top-bar">
       <div class="brand-cluster">
-        <span class="leica-dot" title="LensCraft Optical Engine"></span>
+        <span class="leica-dot" title="LensCraft GPU Optical Engine"></span>
         <span class="brand-title">LENSCRAFT</span>
-        <span id="active-film-badge" class="film-badge-top">CHR • CHROME</span>
+        <span id="active-film-badge" class="film-badge-top">CHR • GPU</span>
       </div>
 
       <div class="hud-toggles">
@@ -996,11 +946,11 @@ const indexHtml = `<!DOCTYPE html>
       <div class="telemetry-overlay-top">
         <div class="exif-live-pill">
           <div id="hud-lens-line">24mm • f/1.8 • AUTO</div>
-          <div id="hud-device-line" class="sub">OPTICAL SENSOR READY</div>
+          <div id="hud-device-line" class="sub">WEBGL GPU SHADER READY</div>
         </div>
 
         <div id="histogram-box" class="histogram-box">
-          <canvas id="histogram-canvas" width="108" height="44"></canvas>
+          <canvas id="histogram-canvas" width="104" height="40"></canvas>
           <span id="histogram-label" class="histogram-label">RGB • LUMA</span>
         </div>
       </div>
@@ -1022,12 +972,12 @@ const indexHtml = `<!DOCTYPE html>
         <div id="film-strip-scroll" class="film-strip-scroll"></div>
         <div class="character-sliders">
           <div class="mini-slider-group">
-            <div class="mini-slider-header"><span>GRAIN</span><span id="val-grain">25%</span></div>
-            <input id="slider-grain" type="range" class="pro-range" min="0" max="100" value="25" />
+            <div class="mini-slider-header"><span>GRAIN</span><span id="val-grain">20%</span></div>
+            <input id="slider-grain" type="range" class="pro-range" min="0" max="100" value="20" />
           </div>
           <div class="mini-slider-group">
-            <div class="mini-slider-header"><span>HALATION</span><span id="val-halation">30%</span></div>
-            <input id="slider-halation" type="range" class="pro-range" min="0" max="100" value="30" />
+            <div class="mini-slider-header"><span>HALATION</span><span id="val-halation">25%</span></div>
+            <input id="slider-halation" type="range" class="pro-range" min="0" max="100" value="25" />
           </div>
           <div class="mini-slider-group">
             <div class="mini-slider-header"><span>VIGNETTE</span><span id="val-vignette">20%</span></div>
@@ -1129,30 +1079,30 @@ const indexHtml = `<!DOCTYPE html>
 `;
 
 // ---------------------------------------------------------------------------
-// 3. app.js — Film Simulation Engine, Manual Camera Controller, & Native Bridge
+// 3. app.js — Pure Hardware WebGL Shader Engine (Zero CPU Pixel Loops!)
 // ---------------------------------------------------------------------------
 const appJs = `(() => {
   'use strict';
 
   // -------------------------------------------------------------------------
-  // 1. FILM SIMULATION RECIPES (8 Iconic Stocks)
+  // 1. FILM SIMULATION RECIPES (8 Iconic Stocks — GPU Uniform Parameters)
   // -------------------------------------------------------------------------
   const FILM_RECIPES = [
     {
       id: 'CHR',
       name: 'Classic Chrome',
       desc: 'Muted shadows • Documentary cyan skies',
-      contrast: 1.16,
+      contrast: 1.15,
       saturation: 0.82,
-      warmth: 6,
-      tint: -3,
-      shadowLift: 8,
-      highlightRoll: 0.90,
-      bw: false,
-      redFilter: false,
-      defaultGrain: 25,
-      defaultHalation: 20,
-      defaultVignette: 22
+      warmth: 0.025,
+      tint: -0.012,
+      shadowLift: 0.03,
+      highlightRoll: 0.88,
+      bw: 0,
+      redFilter: 0,
+      defaultGrain: 20,
+      defaultHalation: 18,
+      defaultVignette: 20
     },
     {
       id: 'POR',
@@ -1160,47 +1110,47 @@ const appJs = `(() => {
       desc: 'Golden skin tones • Creamy highlights',
       contrast: 1.06,
       saturation: 1.08,
-      warmth: 16,
-      tint: 4,
-      shadowLift: 14,
-      highlightRoll: 0.92,
-      bw: false,
-      redFilter: false,
-      defaultGrain: 22,
-      defaultHalation: 18,
-      defaultVignette: 18
+      warmth: 0.055,
+      tint: 0.015,
+      shadowLift: 0.048,
+      highlightRoll: 0.90,
+      bw: 0,
+      redFilter: 0,
+      defaultGrain: 18,
+      defaultHalation: 15,
+      defaultVignette: 16
     },
     {
       id: '800T',
       name: 'CineStill 800T',
       desc: 'Tungsten night • Red halation glow',
       contrast: 1.18,
-      saturation: 1.05,
-      warmth: -14,
-      tint: 6,
-      shadowLift: 6,
-      highlightRoll: 0.88,
-      bw: false,
-      redFilter: false,
-      defaultGrain: 35,
+      saturation: 1.06,
+      warmth: -0.05,
+      tint: 0.02,
+      shadowLift: 0.022,
+      highlightRoll: 0.86,
+      bw: 0,
+      redFilter: 0,
+      defaultGrain: 28,
       defaultHalation: 65,
-      defaultVignette: 28
+      defaultVignette: 26
     },
     {
       id: 'VEL',
       name: 'Fujichrome Velvia 50',
       desc: 'Vivid landscape • Deep micro-contrast',
       contrast: 1.24,
-      saturation: 1.38,
-      warmth: 5,
-      tint: 2,
-      shadowLift: -4,
-      highlightRoll: 0.95,
-      bw: false,
-      redFilter: false,
-      defaultGrain: 12,
+      saturation: 1.36,
+      warmth: 0.02,
+      tint: 0.01,
+      shadowLift: -0.015,
+      highlightRoll: 0.94,
+      bw: 0,
+      redFilter: 0,
+      defaultGrain: 10,
       defaultHalation: 10,
-      defaultVignette: 24
+      defaultVignette: 22
     },
     {
       id: 'ACR',
@@ -1208,15 +1158,15 @@ const appJs = `(() => {
       desc: 'Fine silver B&W • Rich tonal curve',
       contrast: 1.26,
       saturation: 0.0,
-      warmth: 0,
-      tint: 0,
-      shadowLift: 4,
-      highlightRoll: 0.92,
-      bw: true,
-      redFilter: false,
-      defaultGrain: 32,
-      defaultHalation: 15,
-      defaultVignette: 26
+      warmth: 0.0,
+      tint: 0.0,
+      shadowLift: 0.015,
+      highlightRoll: 0.90,
+      bw: 1,
+      redFilter: 0,
+      defaultGrain: 26,
+      defaultHalation: 12,
+      defaultVignette: 24
     },
     {
       id: 'MCR',
@@ -1224,15 +1174,15 @@ const appJs = `(() => {
       desc: 'High-contrast B&W • Dramatic skies',
       contrast: 1.38,
       saturation: 0.0,
-      warmth: 0,
-      tint: 0,
-      shadowLift: -6,
-      highlightRoll: 0.89,
-      bw: true,
-      redFilter: true,
-      defaultGrain: 38,
-      defaultHalation: 12,
-      defaultVignette: 32
+      warmth: 0.0,
+      tint: 0.0,
+      shadowLift: -0.02,
+      highlightRoll: 0.88,
+      bw: 1,
+      redFilter: 1,
+      defaultGrain: 30,
+      defaultHalation: 10,
+      defaultVignette: 30
     },
     {
       id: 'AST',
@@ -1240,14 +1190,14 @@ const appJs = `(() => {
       desc: 'Gentle portrait • Silky pastel tones',
       contrast: 0.98,
       saturation: 1.04,
-      warmth: 8,
-      tint: 3,
-      shadowLift: 16,
-      highlightRoll: 0.90,
-      bw: false,
-      redFilter: false,
-      defaultGrain: 15,
-      defaultHalation: 20,
+      warmth: 0.03,
+      tint: 0.012,
+      shadowLift: 0.055,
+      highlightRoll: 0.88,
+      bw: 0,
+      redFilter: 0,
+      defaultGrain: 12,
+      defaultHalation: 16,
       defaultVignette: 14
     },
     {
@@ -1256,13 +1206,13 @@ const appJs = `(() => {
       desc: 'True optical neutral • Clean color',
       contrast: 1.04,
       saturation: 1.0,
-      warmth: 0,
-      tint: 0,
-      shadowLift: 0,
-      highlightRoll: 0.96,
-      bw: false,
-      redFilter: false,
-      defaultGrain: 10,
+      warmth: 0.0,
+      tint: 0.0,
+      shadowLift: 0.0,
+      highlightRoll: 0.95,
+      bw: 0,
+      redFilter: 0,
+      defaultGrain: 8,
       defaultHalation: 0,
       defaultVignette: 10
     }
@@ -1289,9 +1239,9 @@ const appJs = `(() => {
   // -------------------------------------------------------------------------
   const state = {
     film: FILM_RECIPES[0],
-    grain: 25,
-    halation: 20,
-    vignette: 22,
+    grain: 20,
+    halation: 18,
+    vignette: 20,
     iso: 'AUTO',
     shutter: 'AUTO',
     ev: '0.0',
@@ -1304,7 +1254,7 @@ const appJs = `(() => {
     facingMode: 'environment',
     torch: false,
     aspectIndex: 0,
-    gridMode: 1, // 0: off, 1: thirds, 2: golden
+    gridMode: 1,
     showHistogram: true,
     showZebra: false,
     showPeaking: false,
@@ -1316,18 +1266,16 @@ const appJs = `(() => {
     deviceModel: 'LENSCRAFT OPTICAL',
     stream: null,
     videoTrack: null,
-    labImage: null, // Optional static image for Film Lab testing
-    capturedShots: [], // Array of { rawCanvas, framedDataUrl, meta, palette }
-    currentShotIndex: 0,
-    rollAngle: 0
+    labImage: null,
+    capturedShots: [],
+    currentShotIndex: 0
   };
 
   // -------------------------------------------------------------------------
-  // 3. DOM ELEMENTS
+  // 3. DOM & HARDWARE WEBGL SHADER INITIALIZATION
   // -------------------------------------------------------------------------
   const videoEl = document.getElementById('live-video');
   const vfCanvas = document.getElementById('viewfinder-canvas');
-  const vfCtx = vfCanvas.getContext('2d', { willReadFrequently: true });
   const histCanvas = document.getElementById('histogram-canvas');
   const histCtx = histCanvas.getContext('2d');
   const cropBox = document.getElementById('crop-box');
@@ -1341,9 +1289,190 @@ const appJs = `(() => {
   const valueWheelBar = document.getElementById('value-wheel-bar');
   const toastBanner = document.getElementById('toast-banner');
 
-  // Offscreen work canvas for fast 60fps shader & histogram processing
-  const workCanvas = document.createElement('canvas');
-  const workCtx = workCanvas.getContext('2d', { willReadFrequently: true });
+  // Tiny 48x36 canvas strictly for throttled 8fps histogram sampling (0.04ms CPU)
+  const tinyCanvas = document.createElement('canvas');
+  tinyCanvas.width = 48;
+  tinyCanvas.height = 36;
+  const tinyCtx = tinyCanvas.getContext('2d', { willReadFrequently: true });
+
+  // WebGL GPU Context on Viewfinder Canvas
+  const gl = vfCanvas.getContext('webgl', {
+    alpha: false,
+    antialias: false,
+    depth: false,
+    stencil: false,
+    preserveDrawingBuffer: true,
+    powerPreference: 'high-performance'
+  });
+
+  let glProgram = null;
+  let glTexture = null;
+  let uLocs = {};
+
+  function initWebGL() {
+    if (!gl) return false;
+
+    const vsSource = \`
+      attribute vec2 a_pos;
+      attribute vec2 a_uv;
+      uniform float u_zoom;
+      uniform float u_mirror;
+      varying vec2 v_uv;
+      void main() {
+        gl_Position = vec4(a_pos, 0.0, 1.0);
+        vec2 centered = (a_uv - 0.5) / max(1.0, u_zoom) + 0.5;
+        if (u_mirror > 0.5) {
+          centered.x = 1.0 - centered.x;
+        }
+        v_uv = centered;
+      }
+    \`;
+
+    const fsSource = \`
+      precision mediump float;
+      varying vec2 v_uv;
+      uniform sampler2D u_tex;
+      uniform float u_gain;
+      uniform float u_contrast;
+      uniform float u_sat;
+      uniform vec3 u_wbOffset;
+      uniform float u_shadowLift;
+      uniform float u_highlightRoll;
+      uniform float u_bw;
+      uniform float u_redFilter;
+      uniform float u_grain;
+      uniform float u_halation;
+      uniform float u_vignette;
+      uniform float u_zebra;
+      uniform float u_peaking;
+      uniform float u_time;
+      uniform vec2 u_texel;
+
+      float hash(vec2 p) {
+        return fract(sin(dot(p, vec2(12.9898, 78.233)) + u_time) * 43758.5453);
+      }
+
+      void main() {
+        vec3 col = texture2D(u_tex, v_uv).rgb * u_gain;
+
+        // 1. White Balance & Recipe Shift
+        col += u_wbOffset;
+
+        // 2. Contrast, Shadow Lift & Highlight Roll-off
+        col = (col - 0.5) * u_contrast + 0.5 + u_shadowLift;
+        vec3 over = max(vec3(0.0), col - 0.82);
+        col = min(col, vec3(0.82)) + over * u_highlightRoll;
+
+        // 3. Luminance & B&W / Saturation
+        float luma = dot(col, vec3(0.299, 0.587, 0.114));
+        if (u_bw > 0.5) {
+          float m = u_redFilter > 0.5 ? dot(col, vec3(0.58, 0.34, 0.08)) : luma;
+          col = vec3(m);
+        } else {
+          col = mix(vec3(luma), col, u_sat);
+        }
+
+        // 4. CineStill Highlight Halation (GPU Neighbour Sample + Warm Red-Orange Bloom)
+        if (u_halation > 0.01) {
+          vec3 n1 = texture2D(u_tex, v_uv + vec2(u_texel.x * 3.0, 0.0)).rgb * u_gain;
+          vec3 n2 = texture2D(u_tex, v_uv - vec2(u_texel.x * 3.0, 0.0)).rgb * u_gain;
+          vec3 n3 = texture2D(u_tex, v_uv + vec2(0.0, u_texel.y * 3.0)).rgb * u_gain;
+          float maxL = max(luma, dot((n1 + n2 + n3) * 0.333, vec3(0.299, 0.587, 0.114)));
+          float halo = max(0.0, maxL - 0.78) * u_halation * 2.2;
+          col += vec3(halo * 1.35, halo * 0.35, 0.0);
+        }
+
+        // 5. Optical Lens Vignette
+        if (u_vignette > 0.01) {
+          vec2 d = v_uv - 0.5;
+          float distSq = dot(d, d) * 2.2;
+          col *= max(0.18, 1.0 - distSq * u_vignette);
+        }
+
+        // 6. GPU Film Grain
+        if (u_grain > 0.005) {
+          float n = (hash(v_uv * 400.0) - 0.5) * u_grain;
+          col += vec3(n);
+        }
+
+        col = clamp(col, 0.0, 1.0);
+        float finalLuma = dot(col, vec3(0.299, 0.587, 0.114));
+
+        // 7. HUD Zebra Stripes (Overexposure Warning)
+        if (u_zebra > 0.5 && finalLuma > 0.94) {
+          float stripe = mod(gl_FragCoord.x + gl_FragCoord.y + u_time * 30.0, 10.0);
+          if (stripe < 4.0) {
+            col = vec3(1.0, 0.15, 0.15);
+          }
+        }
+
+        // 8. HUD Focus Peaking (GPU Edge Detection)
+        if (u_peaking > 0.5) {
+          vec3 rightCol = texture2D(u_tex, v_uv + vec2(u_texel.x * 1.5, 0.0)).rgb;
+          vec3 downCol  = texture2D(u_tex, v_uv + vec2(0.0, u_texel.y * 1.5)).rgb;
+          float edge = length(col - rightCol) + length(col - downCol);
+          if (edge > 0.24) {
+            col = vec3(0.06, 0.96, 0.58);
+          }
+        }
+
+        gl_FragColor = vec4(col, 1.0);
+      }
+    \`;
+
+    const compile = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      return s;
+    };
+
+    const vs = compile(gl.VERTEX_SHADER, vsSource);
+    const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+    glProgram = gl.createProgram();
+    gl.attachShader(glProgram, vs);
+    gl.attachShader(glProgram, fs);
+    gl.linkProgram(glProgram);
+    gl.useProgram(glProgram);
+
+    // Fullscreen quad (x, y, u, v)
+    const verts = new Float32Array([
+      -1, -1,  0, 1,
+       1, -1,  1, 1,
+      -1,  1,  0, 0,
+       1,  1,  1, 0
+    ]);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+    const aPos = gl.getAttribLocation(glProgram, 'a_pos');
+    const aUv = gl.getAttribLocation(glProgram, 'a_uv');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 16, 0);
+    gl.enableVertexAttribArray(aUv);
+    gl.vertexAttribPointer(aUv, 2, gl.FLOAT, false, 16, 8);
+
+    glTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, glTexture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    const names = [
+      'u_zoom', 'u_mirror', 'u_gain', 'u_contrast', 'u_sat', 'u_wbOffset',
+      'u_shadowLift', 'u_highlightRoll', 'u_bw', 'u_redFilter',
+      'u_grain', 'u_halation', 'u_vignette', 'u_zebra', 'u_peaking',
+      'u_time', 'u_texel'
+    ];
+    names.forEach((n) => {
+      uLocs[n] = gl.getUniformLocation(glProgram, n);
+    });
+    return true;
+  }
+
+  const hasWebGL = initWebGL();
 
   // -------------------------------------------------------------------------
   // 4. HAPTICS, AUDIO & TOAST UTILITIES
@@ -1355,7 +1484,7 @@ const appJs = `(() => {
         return;
       }
       if (navigator.vibrate) {
-        navigator.vibrate(type === 'shutter' ? [18, 30, 12] : 10);
+        navigator.vibrate(type === 'shutter' ? 16 : 6);
       }
     } catch (_) {}
   }
@@ -1372,43 +1501,20 @@ const appJs = `(() => {
       if (audioCtx.state === 'suspended') audioCtx.resume();
 
       const now = audioCtx.currentTime;
-      // Curtain 1 click
-      const bufferSize = audioCtx.sampleRate * 0.045;
+      const bufferSize = Math.floor(audioCtx.sampleRate * 0.035);
       const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const output = noiseBuffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
-        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.008));
+        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.007));
       }
-
       const whiteNoise = audioCtx.createBufferSource();
       whiteNoise.buffer = noiseBuffer;
-
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(1850, now);
-      filter.Q.setValueAtTime(1.8, now);
-
       const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.45, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
-
-      whiteNoise.connect(filter);
-      filter.connect(gain);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.032);
+      whiteNoise.connect(gain);
       gain.connect(audioCtx.destination);
       whiteNoise.start(now);
-
-      // Curtain 2 mechanical rebound
-      const osc = audioCtx.createOscillator();
-      const oscGain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(320, now + 0.032);
-      osc.frequency.exponentialRampToValueAtTime(95, now + 0.065);
-      oscGain.gain.setValueAtTime(0.22, now + 0.032);
-      oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.068);
-      osc.connect(oscGain);
-      oscGain.connect(audioCtx.destination);
-      osc.start(now + 0.032);
-      osc.stop(now + 0.07);
     } catch (_) {}
   }
 
@@ -1419,11 +1525,11 @@ const appJs = `(() => {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => {
       toastBanner.classList.remove('visible');
-    }, 2400);
+    }, 2000);
   }
 
   // -------------------------------------------------------------------------
-  // 5. QUERY HARDWARE SPECS FROM NATIVE ANDROID BRIDGE
+  // 5. HARDWARE CAMERA SPECS & STREAM SETUP (Optimized HD Stream)
   // -------------------------------------------------------------------------
   function initHardwareInfo() {
     try {
@@ -1431,12 +1537,8 @@ const appJs = `(() => {
         const raw = window.LensCraftAndroid.getDeviceCameraSpecs();
         if (raw) {
           const info = JSON.parse(raw);
-          if (info.model) {
-            state.deviceModel = info.model.toUpperCase();
-          }
-          if (info.aperture) {
-            state.aperture = 'f/' + info.aperture;
-          }
+          if (info.model) state.deviceModel = info.model.toUpperCase();
+          if (info.aperture) state.aperture = 'f/' + info.aperture;
         }
       }
     } catch (_) {}
@@ -1452,12 +1554,9 @@ const appJs = `(() => {
     document.getElementById('hud-device-line').textContent =
       state.deviceModel + ' • ' + state.film.name.toUpperCase();
     document.getElementById('active-film-badge').textContent =
-      state.film.id + ' • ' + state.film.name.split(' ').pop().toUpperCase();
+      state.film.id + ' • GPU';
   }
 
-  // -------------------------------------------------------------------------
-  // 6. CAMERA STREAM INITIALIZATION & HARDWARE CONSTRAINTS
-  // -------------------------------------------------------------------------
   async function startCamera() {
     try {
       if (state.stream) {
@@ -1467,8 +1566,9 @@ const appJs = `(() => {
         audio: false,
         video: {
           facingMode: { ideal: state.facingMode },
-          width: { ideal: 1920 },
-          height: { ideal: 1440 }
+          width: { ideal: 1280 },
+          height: { ideal: 960 },
+          frameRate: { ideal: 30, max: 60 }
         }
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1480,13 +1580,10 @@ const appJs = `(() => {
       applyHardwareTrackConstraints();
       updateTelemetryLabels();
     } catch (err) {
-      console.warn('Camera stream fallback:', err);
-      showToast('📷 Mode Simulasi Sensor Aktif (Atau pilih foto lewat 🖼️ LAB)');
       createProceduralTestScene();
     }
   }
 
-  // Procedural fallback scene so the viewfinder & shaders work even in emulators without a camera
   function createProceduralTestScene() {
     const c = document.createElement('canvas');
     c.width = 960;
@@ -1500,13 +1597,11 @@ const appJs = `(() => {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 960, 720);
 
-    // Sun & city silhouette for testing halation, film simulation, and histogram
     ctx.fillStyle = '#fff5d6';
     ctx.beginPath();
     ctx.arc(640, 260, 58, 0, Math.PI * 2);
     ctx.fill();
 
-    // Color checker swatches at bottom
     const swatches = ['#b8332a', '#d9822b', '#e6c229', '#2b8a3e', '#1971c2', '#6741d9'];
     swatches.forEach((hex, idx) => {
       ctx.fillStyle = hex;
@@ -1546,256 +1641,148 @@ const appJs = `(() => {
   }
 
   // -------------------------------------------------------------------------
-  // 7. REAL-TIME FILM SIMULATION & OPTICAL PIXEL ENGINE
+  // 6. PURE GPU WEBGL RENDERER + THROTTLED TINY HISTOGRAM
   // -------------------------------------------------------------------------
   function computeExposureGain() {
     let evStops = parseFloat(state.ev) || 0;
     if (state.iso !== 'AUTO') {
       const isoNum = parseInt(state.iso, 10) || 200;
-      evStops += Math.log2(isoNum / 200) * 0.45;
+      evStops += Math.log2(isoNum / 200) * 0.42;
     }
     if (state.shutter !== 'AUTO') {
       const parts = state.shutter.split('/');
       const sec = parts.length === 2 ? parseFloat(parts[0]) / parseFloat(parts[1]) : parseFloat(state.shutter);
-      evStops += Math.log2(sec / (1 / 250)) * 0.45;
+      evStops += Math.log2(sec / (1 / 250)) * 0.42;
     }
-    return Math.pow(2, Math.max(-3.0, Math.min(3.0, evStops)));
+    return Math.pow(2, Math.max(-2.8, Math.min(2.8, evStops)));
   }
 
-  function computeWbShift() {
-    if (state.wb === 'AUTO') return { rShift: 0, bShift: 0 };
+  function computeWbOffset() {
+    const rRecipe = state.film.warmth;
+    const gRecipe = state.film.tint;
+    const bRecipe = -state.film.warmth * 0.8;
+    if (state.wb === 'AUTO') return [rRecipe, gRecipe, bRecipe];
     const kelvin = parseInt(state.wb, 10) || 5400;
-    // Relative to 5400K daylight
-    const delta = (kelvin - 5400) / 100;
-    return {
-      rShift: delta * 1.15,
-      bShift: -delta * 1.15
-    };
+    const delta = (kelvin - 5400) / 10000;
+    return [rRecipe + delta, gRecipe, bRecipe - delta];
   }
 
-  function processFramePixels(ctx, width, height, includeHudOverlays = false) {
-    const imgData = ctx.getImageData(0, 0, width, height);
-    const data = imgData.data;
-    const recipe = state.film;
+  function renderWebGLFrame(source, width, height, includeHudOverlays, zoomFactor, mirrorX) {
+    if (!hasWebGL) return;
+    if (vfCanvas.width !== width || vfCanvas.height !== height) {
+      vfCanvas.width = width;
+      vfCanvas.height = height;
+    }
+    gl.viewport(0, 0, width, height);
+    gl.useProgram(glProgram);
+
+    gl.bindTexture(gl.TEXTURE_2D, glTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+
+    const r = state.film;
+    const wb = computeWbOffset();
+
+    gl.uniform1f(uLocs.u_zoom, zoomFactor);
+    gl.uniform1f(uLocs.u_mirror, mirrorX ? 1.0 : 0.0);
+    gl.uniform1f(uLocs.u_gain, computeExposureGain());
+    gl.uniform1f(uLocs.u_contrast, r.contrast);
+    gl.uniform1f(uLocs.u_sat, r.saturation);
+    gl.uniform3f(uLocs.u_wbOffset, wb[0], wb[1], wb[2]);
+    gl.uniform1f(uLocs.u_shadowLift, r.shadowLift);
+    gl.uniform1f(uLocs.u_highlightRoll, r.highlightRoll);
+    gl.uniform1f(uLocs.u_bw, r.bw);
+    gl.uniform1f(uLocs.u_redFilter, r.redFilter);
+    gl.uniform1f(uLocs.u_grain, (state.grain / 100) * 0.14);
+    gl.uniform1f(uLocs.u_halation, state.halation / 100);
+    gl.uniform1f(uLocs.u_vignette, (state.vignette / 100) * 0.65);
+    gl.uniform1f(uLocs.u_zebra, includeHudOverlays && state.showZebra ? 1.0 : 0.0);
+    gl.uniform1f(uLocs.u_peaking, includeHudOverlays && state.showPeaking ? 1.0 : 0.0);
+    gl.uniform1f(uLocs.u_time, (performance.now() * 0.001) % 100.0);
+    gl.uniform2f(uLocs.u_texel, 1.0 / width, 1.0 / height);
+
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
+
+  // Throttled Histogram (~8 FPS on tiny 48x36 canvas -> Zero lag!)
+  let lastHistTime = 0;
+  const histR = new Uint16Array(32);
+  const histG = new Uint16Array(32);
+  const histB = new Uint16Array(32);
+  const histL = new Uint16Array(32);
+
+  function updateTinyHistogram(source, now) {
+    if (!state.showHistogram || now - lastHistTime < 125) return;
+    lastHistTime = now;
+
+    tinyCtx.drawImage(source, 0, 0, 48, 36);
+    const data = tinyCtx.getImageData(0, 0, 48, 36).data;
+    histR.fill(0);
+    histG.fill(0);
+    histB.fill(0);
+    histL.fill(0);
+
     const gain = computeExposureGain();
-    const { rShift, bShift } = computeWbShift();
-
-    const contrast = recipe.contrast;
-    const sat = recipe.saturation;
-    const warmth = recipe.warmth + rShift;
-    const tint = recipe.tint;
-    const blueOffset = -recipe.warmth * 0.8 + bShift;
-    const shadowLift = recipe.shadowLift;
-    const highlightRoll = recipe.highlightRoll;
-
-    const grainStrength = (state.grain / 100) * 34;
-    const halationStrength = state.halation / 100;
-    const vigStrength = (state.vignette / 100) * 0.68;
-
-    const cx = width * 0.5;
-    const cy = height * 0.5;
-    const invMaxDistSq = 1 / (cx * cx + cy * cy);
-
-    const histR = new Uint32Array(64);
-    const histG = new Uint32Array(64);
-    const histB = new Uint32Array(64);
-    const histL = new Uint32Array(64);
-
-    const doZebra = includeHudOverlays && state.showZebra;
-    const doPeaking = includeHudOverlays && state.showPeaking;
-    const timeStripe = Math.floor(performance.now() / 60);
-
-    for (let y = 0; y < height; y++) {
-      const dy = y - cy;
-      const dySq = dy * dy;
-      const rowOffset = y * width;
-
-      for (let x = 0; x < width; x++) {
-        const idx = (rowOffset + x) * 4;
-        let r = data[idx] * gain;
-        let g = data[idx + 1] * gain;
-        let b = data[idx + 2] * gain;
-
-        // 1. White Balance & Recipe Color Matrix
-        r += warmth;
-        g += tint;
-        b += blueOffset;
-
-        // 2. Contrast & Shadow Lift + Highlight Roll-off
-        r = ((r - 128) * contrast + 128) + shadowLift;
-        g = ((g - 128) * contrast + 128) + shadowLift;
-        b = ((b - 128) * contrast + 128) + shadowLift;
-
-        if (r > 210) r = 210 + (r - 210) * highlightRoll;
-        if (g > 210) g = 210 + (g - 210) * highlightRoll;
-        if (b > 210) b = 210 + (b - 210) * highlightRoll;
-
-        // 3. Monochrome / Red Filter or Saturation
-        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
-        if (recipe.bw) {
-          const mono = recipe.redFilter ? (0.58 * r + 0.34 * g + 0.08 * b) : luma;
-          r = g = b = mono;
-        } else if (sat !== 1.0) {
-          r = luma + (r - luma) * sat;
-          g = luma + (g - luma) * sat;
-          b = luma + (b - luma) * sat;
-        }
-
-        // 4. CineStill / Optical Highlight Halation (Warm Red-Orange Bloom on High Luma)
-        if (halationStrength > 0 && luma > 205) {
-          const halo = (luma - 205) * halationStrength * 0.95;
-          r += halo * 1.35;
-          g += halo * 0.38;
-        }
-
-        // 5. Optical Lens Vignette
-        if (vigStrength > 0) {
-          const dx = x - cx;
-          const distNorm = (dx * dx + dySq) * invMaxDistSq;
-          const vigFactor = Math.max(0.18, 1 - distNorm * vigStrength);
-          r *= vigFactor;
-          g *= vigFactor;
-          b *= vigFactor;
-        }
-
-        // 6. Organic Film Grain
-        if (grainStrength > 0) {
-          const noise = ((Math.random() - 0.5) * grainStrength);
-          r += noise;
-          g += noise;
-          b += noise;
-        }
-
-        // Clamp
-        r = r < 0 ? 0 : r > 255 ? 255 : r;
-        g = g < 0 ? 0 : g > 255 ? 255 : g;
-        b = b < 0 ? 0 : b > 255 ? 255 : b;
-
-        const finalLuma = 0.299 * r + 0.587 * g + 0.114 * b;
-
-        // Sample every 2nd pixel for 60fps RGB Histogram
-        if (includeHudOverlays && ((x + y) & 1) === 0) {
-          histR[r >> 2]++;
-          histG[g >> 2]++;
-          histB[b >> 2]++;
-          histL[finalLuma >> 2]++;
-        }
-
-        // 7. Live Viewfinder Overlays (Zebra Clipping & Focus Peaking)
-        if (doZebra && finalLuma >= 242) {
-          if (((x + y + timeStripe) & 7) < 3) {
-            r = 255;
-            g = 40;
-            b = 40;
-          }
-        } else if (doPeaking && x > 1 && x < width - 1) {
-          const prevIdx = idx - 4;
-          const edge = Math.abs(finalLuma - data[prevIdx]);
-          if (edge > 28) {
-            r = 16;
-            g = 245;
-            b = 150;
-          }
-        }
-
-        data[idx] = r;
-        data[idx + 1] = g;
-        data[idx + 2] = b;
-      }
+    for (let i = 0; i < data.length; i += 8) {
+      const r = Math.min(255, data[i] * gain) >> 3;
+      const g = Math.min(255, data[i + 1] * gain) >> 3;
+      const b = Math.min(255, data[i + 2] * gain) >> 3;
+      const l = (r * 77 + g * 150 + b * 29) >> 8;
+      histR[r]++;
+      histG[g]++;
+      histB[b]++;
+      histL[l]++;
     }
 
-    ctx.putImageData(imgData, 0, 0);
-
-    if (includeHudOverlays && state.showHistogram) {
-      drawHistogram(histR, histG, histB, histL);
-    }
-  }
-
-  function drawHistogram(histR, histG, histB, histL) {
     const w = histCanvas.width;
     const h = histCanvas.height;
     histCtx.clearRect(0, 0, w, h);
 
     let maxVal = 1;
-    for (let i = 2; i < 62; i++) {
+    for (let i = 1; i < 31; i++) {
       if (histL[i] > maxVal) maxVal = histL[i];
     }
 
-    const drawChannel = (bins, stroke, fill) => {
+    const drawChan = (bins, stroke) => {
       histCtx.beginPath();
-      histCtx.moveTo(0, h);
-      for (let i = 0; i < 64; i++) {
-        const x = (i / 63) * w;
-        const norm = Math.min(1, bins[i] / maxVal);
-        const y = h - norm * (h - 4);
-        histCtx.lineTo(x, y);
+      for (let i = 0; i < 32; i++) {
+        const x = (i / 31) * w;
+        const y = h - Math.min(1, bins[i] / maxVal) * (h - 4);
+        if (i === 0) histCtx.moveTo(x, y);
+        else histCtx.lineTo(x, y);
       }
-      histCtx.lineTo(w, h);
-      histCtx.closePath();
-      histCtx.fillStyle = fill;
-      histCtx.fill();
       histCtx.strokeStyle = stroke;
-      histCtx.lineWidth = 1;
+      histCtx.lineWidth = 1.4;
       histCtx.stroke();
     };
 
-    drawChannel(histR, 'rgba(239,68,68,0.85)', 'rgba(239,68,68,0.22)');
-    drawChannel(histG, 'rgba(52,211,153,0.85)', 'rgba(52,211,153,0.20)');
-    drawChannel(histB, 'rgba(96,165,250,0.85)', 'rgba(96,165,250,0.22)');
-    drawChannel(histL, 'rgba(255,255,255,0.9)', 'rgba(255,255,255,0.14)');
+    drawChan(histR, '#ef4444');
+    drawChan(histG, '#34d399');
+    drawChan(histB, '#60a5fa');
+    drawChan(histL, '#ffffff');
   }
 
-  // -------------------------------------------------------------------------
-  // 8. VIEWFINDER RENDER LOOP (60 FPS)
-  // -------------------------------------------------------------------------
-  function renderViewfinderLoop() {
+  function renderViewfinderLoop(now) {
     const source = state.labImage || (videoEl.readyState >= 2 ? videoEl : null);
     if (source) {
-      const srcW = state.labImage ? state.labImage.width : (videoEl.videoWidth || 640);
-      const srcH = state.labImage ? state.labImage.height : (videoEl.videoHeight || 480);
-
+      const srcW = state.labImage ? state.labImage.width : (videoEl.videoWidth || 960);
+      const srcH = state.labImage ? state.labImage.height : (videoEl.videoHeight || 720);
       if (srcW > 0 && srcH > 0) {
-        const targetW = 480;
-        const targetH = Math.round((srcH / srcW) * targetW);
-        if (workCanvas.width !== targetW || workCanvas.height !== targetH) {
-          workCanvas.width = targetW;
-          workCanvas.height = targetH;
-          vfCanvas.width = targetW;
-          vfCanvas.height = targetH;
-        }
-
-        // Apply digital zoom crop smoothly if zoom > 1
-        const z = Math.max(1.0, state.zoom);
-        const cropW = srcW / z;
-        const cropH = srcH / z;
-        const cropX = (srcW - cropW) * 0.5;
-        const cropY = (srcH - cropH) * 0.5;
-
-        workCtx.save();
-        if (state.facingMode === 'user' && !state.labImage) {
-          workCtx.translate(targetW, 0);
-          workCtx.scale(-1, 1);
-        }
-        workCtx.drawImage(source, cropX, cropY, cropW, cropH, 0, 0, targetW, targetH);
-        workCtx.restore();
-
-        processFramePixels(workCtx, targetW, targetH, true);
-        vfCtx.drawImage(workCanvas, 0, 0);
+        const dispW = Math.min(960, srcW);
+        const dispH = Math.round((srcH / srcW) * dispW);
+        const mirrorX = state.facingMode === 'user' && !state.labImage;
+        renderWebGLFrame(source, dispW, dispH, true, Math.max(1.0, state.zoom), mirrorX);
+        updateTinyHistogram(source, now);
       }
     }
     requestAnimationFrame(renderViewfinderLoop);
   }
 
   // -------------------------------------------------------------------------
-  // 9. HIGH-RESOLUTION CAPTURE & LEICA EXIF FRAME GENERATOR
+  // 7. INSTANT GPU PHOTO CAPTURE & LEICA EXIF FRAME GENERATOR
   // -------------------------------------------------------------------------
-  function extractDominantPalette(canvas) {
-    const sample = document.createElement('canvas');
-    sample.width = 24;
-    sample.height = 24;
-    const sctx = sample.getContext('2d');
-    sctx.drawImage(canvas, 0, 0, 24, 24);
-    const data = sctx.getImageData(0, 0, 24, 24).data;
+  function extractDominantPalette(sourceCanvas) {
+    tinyCtx.drawImage(sourceCanvas, 0, 0, 24, 24);
+    const data = tinyCtx.getImageData(0, 0, 24, 24).data;
     const buckets = [
       { r: 0, g: 0, b: 0, c: 0 },
       { r: 0, g: 0, b: 0, c: 0 },
@@ -1822,7 +1809,7 @@ const appJs = `(() => {
 
   function renderExifFramedImage(rawCanvas, meta, palette, frameStyle) {
     if (frameStyle === 'none') {
-      return rawCanvas.toDataURL('image/jpeg', 0.95);
+      return rawCanvas.toDataURL('image/jpeg', 0.92);
     }
 
     const out = document.createElement('canvas');
@@ -1834,51 +1821,39 @@ const appJs = `(() => {
       out.width = w;
       out.height = h;
       ctx.drawImage(rawCanvas, 0, 0);
-
-      // Classic 90s quartz date + recipe stamp in bottom-right
       const fontSize = Math.max(18, Math.round(w * 0.026));
       ctx.font = '700 ' + fontSize + 'px "JetBrains Mono", monospace';
       ctx.textAlign = 'right';
       const stampText = meta.dateShort + '  •  ' + meta.filmCode + ' ' + meta.focalMm + 'MM';
-      ctx.shadowColor = 'rgba(239, 68, 68, 0.85)';
-      ctx.shadowBlur = 8;
       ctx.fillStyle = '#ff9233';
       ctx.fillText(stampText, w - Math.round(w * 0.035), h - Math.round(h * 0.035));
-      return out.toDataURL('image/jpeg', 0.95);
+      return out.toDataURL('image/jpeg', 0.92);
     }
 
-    // Leica White or Darkroom Black Gallery Border
     const isDark = frameStyle === 'darkroom-black';
     const padSide = Math.round(w * 0.042);
     const padTop = Math.round(w * 0.042);
-    const footerH = Math.round(Math.max(130, w * 0.145));
+    const footerH = Math.round(Math.max(120, w * 0.14));
 
     out.width = w + padSide * 2;
     out.height = h + padTop + footerH;
 
     ctx.fillStyle = isDark ? '#0b0d11' : '#fbfaf7';
     ctx.fillRect(0, 0, out.width, out.height);
-
-    // Subtle inner shadow border around photo
     ctx.drawImage(rawCanvas, padSide, padTop);
-    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(padSide, padTop, w, h);
 
     const footerCenterY = padTop + h + footerH * 0.52;
     const leftX = padSide;
     const rightX = out.width - padSide;
 
-    // Red Leica Dot
-    const dotRadius = Math.max(10, Math.round(w * 0.013));
+    const dotRadius = Math.max(9, Math.round(w * 0.013));
     ctx.fillStyle = '#e11d48';
     ctx.beginPath();
     ctx.arc(leftX + dotRadius, footerCenterY - footerH * 0.12, dotRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    // Camera / Device Name
-    const titleSize = Math.max(18, Math.round(w * 0.025));
-    const subSize = Math.max(13, Math.round(w * 0.017));
+    const titleSize = Math.max(16, Math.round(w * 0.025));
+    const subSize = Math.max(12, Math.round(w * 0.017));
     ctx.textAlign = 'left';
     ctx.fillStyle = isDark ? '#f4f6f8' : '#111318';
     ctx.font = '800 ' + titleSize + 'px "Inter", sans-serif';
@@ -1892,9 +1867,8 @@ const appJs = `(() => {
       footerCenterY + footerH * 0.18
     );
 
-    // 5-Color Dominant Palette Swatches in Center-Right
-    const swatchW = Math.max(16, Math.round(w * 0.022));
-    const swatchH = Math.max(16, Math.round(w * 0.022));
+    const swatchW = Math.max(14, Math.round(w * 0.022));
+    const swatchH = Math.max(14, Math.round(w * 0.022));
     const paletteStartX = rightX - swatchW * 5 - Math.round(w * 0.28);
     if (paletteStartX > leftX + Math.round(w * 0.42)) {
       palette.forEach((hex, idx) => {
@@ -1908,7 +1882,6 @@ const appJs = `(() => {
       });
     }
 
-    // Right Technical EXIF Specs
     ctx.textAlign = 'right';
     ctx.fillStyle = isDark ? '#f4f6f8' : '#111318';
     ctx.font = '700 ' + Math.round(titleSize * 0.9) + 'px "JetBrains Mono", monospace';
@@ -1922,16 +1895,15 @@ const appJs = `(() => {
     ctx.font = '500 ' + subSize + 'px "JetBrains Mono", monospace';
     ctx.fillText(meta.timestamp, rightX, footerCenterY + footerH * 0.18);
 
-    return out.toDataURL('image/jpeg', 0.95);
+    return out.toDataURL('image/jpeg', 0.92);
   }
 
-  async function capturePhoto() {
+  function capturePhoto() {
     triggerHaptic('shutter');
     playMechanicalShutterSound();
 
-    // Shutter curtain visual blink
     shutterCurtain.classList.add('fired');
-    setTimeout(() => shutterCurtain.classList.remove('fired'), 110);
+    setTimeout(() => shutterCurtain.classList.remove('fired'), 90);
 
     const source = state.labImage || (videoEl.readyState >= 2 ? videoEl : null);
     if (!source) {
@@ -1941,25 +1913,25 @@ const appJs = `(() => {
 
     const srcW = state.labImage ? state.labImage.width : (videoEl.videoWidth || 1280);
     const srcH = state.labImage ? state.labImage.height : (videoEl.videoHeight || 960);
+    const mirrorX = state.facingMode === 'user' && !state.labImage;
 
-    // Compute aspect ratio + zoom crop on full native source resolution
-    const z = Math.max(1.0, state.zoom);
-    let zoomedW = srcW / z;
-    let zoomedH = srcH / z;
+    // Render clean GPU frame (without Zebra/Peaking overlays) at native resolution on WebGL!
+    renderWebGLFrame(source, srcW, srcH, false, Math.max(1.0, state.zoom), mirrorX);
 
+    // Crop to selected Aspect Ratio on GPU output
     const targetAspect = ASPECT_RATIOS[state.aspectIndex].ratio;
-    const currentAspect = zoomedW / zoomedH;
-    // In portrait orientation, invert aspect if video stream is portrait
-    const effectiveAspect = srcH > srcW ? (1 / targetAspect) : targetAspect;
+    const currentAspect = srcW / srcH;
+    const effectiveAspect = (srcH > srcW && ASPECT_RATIOS[state.aspectIndex].label !== 'XPAN')
+      ? (1 / targetAspect)
+      : targetAspect;
 
-    let cropW = zoomedW;
-    let cropH = zoomedH;
+    let cropW = srcW;
+    let cropH = srcH;
     if (currentAspect > effectiveAspect) {
-      cropW = zoomedH * effectiveAspect;
+      cropW = srcH * effectiveAspect;
     } else {
-      cropH = zoomedW / effectiveAspect;
+      cropH = srcW / effectiveAspect;
     }
-
     const cropX = (srcW - cropW) * 0.5;
     const cropY = (srcH - cropH) * 0.5;
 
@@ -1967,56 +1939,47 @@ const appJs = `(() => {
     rawCanvas.width = Math.round(cropW);
     rawCanvas.height = Math.round(cropH);
     const rCtx = rawCanvas.getContext('2d');
+    rCtx.drawImage(vfCanvas, cropX, cropY, cropW, cropH, 0, 0, rawCanvas.width, rawCanvas.height);
 
-    rCtx.save();
-    if (state.facingMode === 'user' && !state.labImage) {
-      rCtx.translate(rawCanvas.width, 0);
-      rCtx.scale(-1, 1);
-    }
-    rCtx.drawImage(source, cropX, cropY, cropW, cropH, 0, 0, rawCanvas.width, rawCanvas.height);
-    rCtx.restore();
+    // Defer framing & gallery write to next tick so UI never stutters
+    setTimeout(() => {
+      const now = new Date();
+      const pad2 = (n) => String(n).padStart(2, '0');
+      const meta = {
+        deviceModel: state.deviceModel,
+        filmCode: state.film.id,
+        filmName: state.film.name,
+        focalMm: state.focalMm,
+        aperture: state.aperture,
+        shutter: state.shutter === 'AUTO' ? '1/250s' : state.shutter + 's',
+        iso: state.iso === 'AUTO' ? '200' : state.iso,
+        timestamp:
+          now.getFullYear() + '.' + pad2(now.getMonth() + 1) + '.' + pad2(now.getDate()) +
+          '  ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds()),
+        dateShort:
+          "'" + String(now.getFullYear()).slice(-2) + ' ' + pad2(now.getMonth() + 1) + ' ' + pad2(now.getDate()),
+        fileName:
+          'LensCraft_' + state.film.id + '_' +
+          now.getFullYear() + pad2(now.getMonth() + 1) + pad2(now.getDate()) + '_' +
+          pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds()) + '.jpg'
+      };
 
-    // Apply full-res Film Simulation shader without HUD overlays
-    processFramePixels(rCtx, rawCanvas.width, rawCanvas.height, false);
+      const palette = extractDominantPalette(rawCanvas);
+      const activeStyle = state.exifFrameEnabled ? state.selectedFrameStyle : 'none';
+      const framedDataUrl = renderExifFramedImage(rawCanvas, meta, palette, activeStyle);
 
-    const now = new Date();
-    const pad2 = (n) => String(n).padStart(2, '0');
-    const meta = {
-      deviceModel: state.deviceModel,
-      filmCode: state.film.id,
-      filmName: state.film.name,
-      focalMm: state.focalMm,
-      aperture: state.aperture,
-      shutter: state.shutter === 'AUTO' ? '1/250s' : state.shutter + 's',
-      iso: state.iso === 'AUTO' ? '200' : state.iso,
-      timestamp:
-        now.getFullYear() + '.' + pad2(now.getMonth() + 1) + '.' + pad2(now.getDate()) +
-        '  ' + pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds()),
-      dateShort:
-        "'" + String(now.getFullYear()).slice(-2) + ' ' + pad2(now.getMonth() + 1) + ' ' + pad2(now.getDate()),
-      fileName:
-        'LensCraft_' + state.film.id + '_' +
-        now.getFullYear() + pad2(now.getMonth() + 1) + pad2(now.getDate()) + '_' +
-        pad2(now.getHours()) + pad2(now.getMinutes()) + pad2(now.getSeconds()) + '.jpg'
-    };
+      const shot = { rawCanvas, framedDataUrl, meta, palette };
+      state.capturedShots.unshift(shot);
+      state.currentShotIndex = 0;
 
-    const palette = extractDominantPalette(rawCanvas);
-    const activeStyle = state.exifFrameEnabled ? state.selectedFrameStyle : 'none';
-    const framedDataUrl = renderExifFramedImage(rawCanvas, meta, palette, activeStyle);
+      const thumbImg = document.getElementById('thumb-preview');
+      thumbImg.src = framedDataUrl;
+      thumbImg.style.display = 'block';
+      document.getElementById('thumb-empty-icon').style.display = 'none';
+      document.getElementById('thumb-count').textContent = String(state.capturedShots.length);
 
-    const shot = { rawCanvas, framedDataUrl, meta, palette };
-    state.capturedShots.unshift(shot);
-    state.currentShotIndex = 0;
-
-    // Update Thumbnail Well
-    const thumbImg = document.getElementById('thumb-preview');
-    thumbImg.src = framedDataUrl;
-    thumbImg.style.display = 'block';
-    document.getElementById('thumb-empty-icon').style.display = 'none';
-    document.getElementById('thumb-count').textContent = String(state.capturedShots.length);
-
-    // Auto-Save directly to Android DCIM/LensCraft Gallery!
-    saveDataUrlToGallery(framedDataUrl, meta.fileName, true);
+      saveDataUrlToGallery(framedDataUrl, meta.fileName, true);
+    }, 16);
   }
 
   function dataUrlToBase64(dataUrl) {
@@ -2029,12 +1992,11 @@ const appJs = `(() => {
     if (window.LensCraftAndroid && typeof window.LensCraftAndroid.savePhotoToGallery === 'function') {
       const savedPath = window.LensCraftAndroid.savePhotoToGallery(base64, fileName, 'image/jpeg');
       if (savedPath) {
-        showToast('📸 Tersimpan di Galeri: ' + savedPath);
+        showToast('📸 Tersimpan: ' + savedPath);
         return;
       }
     }
     if (!isAutoCapture) {
-      // Browser fallback download
       const a = document.createElement('a');
       a.href = dataUrl;
       a.download = fileName;
@@ -2043,12 +2005,12 @@ const appJs = `(() => {
       a.remove();
       showToast('💾 Foto diunduh: ' + fileName);
     } else {
-      showToast('📸 Jepretan tersimpan di Film Roll (' + state.film.id + ')');
+      showToast('📸 Tersimpan di Film Roll (' + state.film.id + ')');
     }
   }
 
   // -------------------------------------------------------------------------
-  // 10. UI CONTROLS, DIALS & EVENT BINDINGS
+  // 8. UI CONTROLS, DIALS & EVENT BINDINGS
   // -------------------------------------------------------------------------
   function renderFilmCards() {
     filmStripScroll.innerHTML = '';
@@ -2069,7 +2031,7 @@ const appJs = `(() => {
         document.getElementById('dial-val-film').textContent = r.id;
         renderFilmCards();
         updateTelemetryLabels();
-        showToast('🎞️ Film Simulation: ' + r.name);
+        showToast('🎞️ ' + r.name);
       });
       filmStripScroll.appendChild(card);
     });
@@ -2136,7 +2098,6 @@ const appJs = `(() => {
     const sw = stage.clientWidth || 360;
     const sh = stage.clientHeight || 480;
     const ratioObj = ASPECT_RATIOS[state.aspectIndex];
-    // Respect portrait viewfinder orientation except for panoramic XPAN
     const targetRatio = (sh > sw && ratioObj.label !== 'XPAN' && ratioObj.label !== '1:1')
       ? (1 / ratioObj.ratio)
       : ratioObj.ratio;
@@ -2154,7 +2115,7 @@ const appJs = `(() => {
 
   function openGalleryModal() {
     if (state.capturedShots.length === 0) {
-      showToast('🎞️ Belum ada foto di Film Roll — tekan tombol Shutter dulu!');
+      showToast('🎞️ Belum ada foto di Film Roll');
       return;
     }
     triggerHaptic('tick');
@@ -2177,7 +2138,6 @@ const appJs = `(() => {
   }
 
   function bindEvents() {
-    // Manual Dial Pills
     document.querySelectorAll('.dial-pill').forEach((pill) => {
       pill.addEventListener('click', () => {
         triggerHaptic('tick');
@@ -2193,7 +2153,6 @@ const appJs = `(() => {
       });
     });
 
-    // Character Sliders
     document.getElementById('slider-grain').addEventListener('input', (e) => {
       state.grain = parseInt(e.target.value, 10) || 0;
       document.getElementById('val-grain').textContent = state.grain + '%';
@@ -2207,7 +2166,6 @@ const appJs = `(() => {
       document.getElementById('val-vignette').textContent = state.vignette + '%';
     });
 
-    // Multi-Lens Zoom Buttons
     document.querySelectorAll('.lens-btn[data-zoom]').forEach((btn) => {
       btn.addEventListener('click', () => {
         triggerHaptic('tick');
@@ -2217,11 +2175,9 @@ const appJs = `(() => {
         state.focalMm = parseInt(btn.getAttribute('data-mm'), 10) || 24;
         applyHardwareTrackConstraints();
         updateTelemetryLabels();
-        showToast('🔭 Lensa ' + state.focalMm + 'mm (' + state.zoom + 'x)');
       });
     });
 
-    // Import Photo to Film Lab
     const fileInput = document.getElementById('file-import-input');
     document.getElementById('btn-import-lab').addEventListener('click', () => {
       triggerHaptic('tick');
@@ -2235,19 +2191,17 @@ const appJs = `(() => {
         const img = new Image();
         img.onload = () => {
           state.labImage = img;
-          showToast('🖼️ Foto dimuat ke Film Lab — pilih resep Film & tekan Shutter!');
+          showToast('🖼️ Foto dimuat ke GPU Film Lab');
         };
         img.src = ev.target.result;
       };
       reader.readAsDataURL(file);
     });
 
-    // Top HUD Toggles
     document.getElementById('btn-aspect').addEventListener('click', () => {
       triggerHaptic('tick');
       state.aspectIndex = (state.aspectIndex + 1) % ASPECT_RATIOS.length;
       updateAspectCropBox();
-      showToast('📐 Rasio Frame: ' + ASPECT_RATIOS[state.aspectIndex].label);
     });
 
     document.getElementById('btn-grid').addEventListener('click', (e) => {
@@ -2272,14 +2226,12 @@ const appJs = `(() => {
       triggerHaptic('tick');
       state.showZebra = !state.showZebra;
       e.currentTarget.classList.toggle('active', state.showZebra);
-      showToast(state.showZebra ? '🦓 Overexposure Zebra: ON' : '🦓 Overexposure Zebra: OFF');
     });
 
     document.getElementById('btn-peaking').addEventListener('click', (e) => {
       triggerHaptic('tick');
       state.showPeaking = !state.showPeaking;
       e.currentTarget.classList.toggle('active', state.showPeaking);
-      showToast(state.showPeaking ? '🟢 Focus Peaking: ON' : '🟢 Focus Peaking: OFF');
     });
 
     document.getElementById('btn-level').addEventListener('click', (e) => {
@@ -2293,7 +2245,6 @@ const appJs = `(() => {
       triggerHaptic('tick');
       state.exifFrameEnabled = !state.exifFrameEnabled;
       e.currentTarget.classList.toggle('active', state.exifFrameEnabled);
-      showToast(state.exifFrameEnabled ? '🖼️ Bingkai EXIF Leica: AKTIF' : '🖼️ Bingkai EXIF: NONAKTIF');
     });
 
     document.getElementById('btn-torch').addEventListener('click', (e) => {
@@ -2314,17 +2265,12 @@ const appJs = `(() => {
       setTimeout(updateAspectCropBox, 60);
     });
 
-    // Tap-to-Focus on Viewfinder
     const vfStage = document.getElementById('viewfinder-stage');
     vfStage.addEventListener('pointerdown', (e) => {
       if (e.target.closest('.lens-bar-wrap')) return;
       const rect = vfStage.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      triggerHaptic('tick');
-      focusReticle.style.left = x + 'px';
-      focusReticle.style.top = y + 'px';
+      focusReticle.style.left = (e.clientX - rect.left) + 'px';
+      focusReticle.style.top = (e.clientY - rect.top) + 'px';
       focusReticle.classList.remove('locked');
       focusReticle.classList.add('active');
       focusReticleLabel.textContent = 'AF • SEEK';
@@ -2332,22 +2278,19 @@ const appJs = `(() => {
       setTimeout(() => {
         focusReticle.classList.add('locked');
         focusReticleLabel.textContent = 'AF-S • LOCK';
-        triggerHaptic('tick');
-      }, 260);
+      }, 200);
 
       setTimeout(() => {
         focusReticle.classList.remove('active');
-      }, 2200);
+      }, 1800);
     });
 
-    // Shutter & Dock Buttons
     document.getElementById('btn-shutter').addEventListener('click', capturePhoto);
 
     document.getElementById('btn-sound-toggle').addEventListener('click', (e) => {
       state.shutterSoundEnabled = !state.shutterSoundEnabled;
       e.currentTarget.classList.toggle('active', state.shutterSoundEnabled);
       e.currentTarget.textContent = state.shutterSoundEnabled ? '🔊' : '🔇';
-      showToast(state.shutterSoundEnabled ? '🔊 Suara Shutter Mekanik: ON' : '🔇 Suara Shutter: MUTE');
     });
 
     document.getElementById('btn-reset-all').addEventListener('click', () => {
@@ -2365,17 +2308,15 @@ const appJs = `(() => {
       document.getElementById('dial-val-focus').textContent = 'AF-S';
       applyHardwareTrackConstraints();
       updateTelemetryLabels();
-      showToast('⚡ Semua Dial kembali ke Auto Exposure (AE)');
+      showToast('⚡ Reset Auto Exposure (AE)');
     });
 
     document.getElementById('btn-flip-cam').addEventListener('click', () => {
       triggerHaptic('tick');
       state.facingMode = state.facingMode === 'environment' ? 'user' : 'environment';
       startCamera();
-      showToast(state.facingMode === 'user' ? '🤳 Kamera Depan' : '📷 Kamera Belakang Utama');
     });
 
-    // Film Roll Modal Controls
     document.getElementById('thumb-well').addEventListener('click', openGalleryModal);
     document.getElementById('btn-close-modal').addEventListener('click', () => {
       document.getElementById('gallery-modal').classList.remove('open');
@@ -2428,8 +2369,6 @@ const appJs = `(() => {
       const base64 = dataUrlToBase64(shot.framedDataUrl);
       if (window.LensCraftAndroid && typeof window.LensCraftAndroid.shareFile === 'function') {
         window.LensCraftAndroid.shareFile(base64, shot.meta.fileName, 'image/jpeg');
-      } else {
-        showToast('📤 Gunakan APK Android untuk membuka Share Sheet');
       }
     });
 
@@ -2440,25 +2379,18 @@ const appJs = `(() => {
       const base64 = dataUrlToBase64(shot.framedDataUrl);
       if (window.LensCraftAndroid && typeof window.LensCraftAndroid.openInLightCraft === 'function') {
         window.LensCraftAndroid.openInLightCraft(base64, shot.meta.fileName, 'image/jpeg');
-      } else {
-        showToast('🎞️ Tersimpan di DCIM/LensCraft — siap di-import di LightCraft!');
       }
     });
 
-    // Hardware Volume Key Shutter Event from MainActivity.java
     window.addEventListener('lenscraft:hardware-shutter', () => {
       const modalOpen = document.getElementById('gallery-modal').classList.contains('open');
-      if (!modalOpen) {
-        capturePhoto();
-      }
+      if (!modalOpen) capturePhoto();
     });
 
-    // Re-init camera when Native Android OS Camera Permission is granted
     window.addEventListener('lenscraft:permission-granted', () => {
       startCamera();
     });
 
-    // DeviceOrientation for 3D Electronic Horizon Level
     window.addEventListener('deviceorientation', (e) => {
       if (!state.showLevel || e.gamma === null) return;
       const roll = Math.max(-45, Math.min(45, e.gamma || 0));
@@ -2469,9 +2401,6 @@ const appJs = `(() => {
     window.addEventListener('resize', updateAspectCropBox);
   }
 
-  // -------------------------------------------------------------------------
-  // 11. BOOTSTRAP
-  // -------------------------------------------------------------------------
   renderFilmCards();
   syncCharacterSliders();
   bindEvents();
@@ -2486,4 +2415,4 @@ fs.writeFileSync(path.join(distDir, 'styles.css'), stylesCss, 'utf8');
 fs.writeFileSync(path.join(distDir, 'index.html'), indexHtml, 'utf8');
 fs.writeFileSync(path.join(distDir, 'app.js'), appJs, 'utf8');
 
-console.log('✅ Built LensCraft Pro Camera web assets into dist/ (index.html, styles.css, app.js)');
+console.log('✅ Built LensCraft v1.1 Pure WebGL GPU Shader assets into dist/');

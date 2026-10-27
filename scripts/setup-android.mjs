@@ -169,6 +169,7 @@ public class MainActivity extends BridgeActivity {
                 settings.setAllowFileAccess(true);
                 settings.setAllowContentAccess(true);
                 settings.setMediaPlaybackRequiresUserGesture(false);
+                webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 webView.addJavascriptInterface(new LensCraftNativeBridge(), "LensCraftAndroid");
             }
         } catch (Exception ignored) {}
@@ -283,55 +284,56 @@ public class MainActivity extends BridgeActivity {
     public class LensCraftNativeBridge {
         @JavascriptInterface
         public String savePhotoToGallery(String base64Data, String fileName, String mimeType) {
-            try {
-                byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
-                String safeMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/jpeg";
+            new Thread(() -> {
+                try {
+                    byte[] bytes = Base64.decode(base64Data, Base64.DEFAULT);
+                    String safeMime = (mimeType != null && !mimeType.isEmpty()) ? mimeType : "image/jpeg";
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    ContentResolver resolver = getContentResolver();
-                    ContentValues values = new ContentValues();
-                    values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
-                    values.put(MediaStore.Images.Media.MIME_TYPE, safeMime);
-                    values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/LensCraft");
-                    Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
-                    if (uri != null) {
-                        OutputStream os = resolver.openOutputStream(uri);
-                        if (os != null) {
-                            os.write(bytes);
-                            os.flush();
-                            os.close();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        ContentResolver resolver = getContentResolver();
+                        ContentValues values = new ContentValues();
+                        values.put(MediaStore.Images.Media.DISPLAY_NAME, fileName);
+                        values.put(MediaStore.Images.Media.MIME_TYPE, safeMime);
+                        values.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/LensCraft");
+                        Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                        if (uri != null) {
+                            OutputStream os = resolver.openOutputStream(uri);
+                            if (os != null) {
+                                os.write(bytes);
+                                os.flush();
+                                os.close();
+                            }
+                            return;
                         }
-                        return "DCIM/LensCraft/" + fileName;
                     }
-                }
 
-                File dcimDir = new File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
-                    "LensCraft"
-                );
-                if (!dcimDir.exists()) {
-                    dcimDir.mkdirs();
+                    File dcimDir = new File(
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                        "LensCraft"
+                    );
+                    if (!dcimDir.exists()) {
+                        dcimDir.mkdirs();
+                    }
+                    File outFile = new File(dcimDir, fileName);
+                    FileOutputStream fos = new FileOutputStream(outFile);
+                    fos.write(bytes);
+                    fos.flush();
+                    fos.close();
+                    MediaScannerConnection.scanFile(
+                        MainActivity.this,
+                        new String[]{outFile.getAbsolutePath()},
+                        new String[]{safeMime},
+                        null
+                    );
+                } catch (Exception e) {
+                    runOnUiThread(() -> Toast.makeText(
+                        MainActivity.this,
+                        "❌ Gagal simpan ke Galeri: " + e.getMessage(),
+                        Toast.LENGTH_LONG
+                    ).show());
                 }
-                File outFile = new File(dcimDir, fileName);
-                FileOutputStream fos = new FileOutputStream(outFile);
-                fos.write(bytes);
-                fos.flush();
-                fos.close();
-                MediaScannerConnection.scanFile(
-                    MainActivity.this,
-                    new String[]{outFile.getAbsolutePath()},
-                    new String[]{safeMime},
-                    null
-                );
-                return "DCIM/LensCraft/" + fileName;
-            } catch (Exception e) {
-                runOnUiThread(() -> Toast.makeText(
-                    MainActivity.this,
-                    "❌ Gagal simpan ke Galeri: " + e.getMessage(),
-                    Toast.LENGTH_LONG
-                ).show());
-                return "";
-            }
+            }).start();
+            return "DCIM/LensCraft/" + fileName;
         }
 
         @JavascriptInterface
