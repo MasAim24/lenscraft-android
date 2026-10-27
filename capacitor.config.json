@@ -1,0 +1,8 @@
+{
+  "appId": "com.storytold.lenscraft",
+  "appName": "LensCraft",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}

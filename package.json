@@ -1,0 +1,17 @@
+{
+  "name": "lenscraft-android",
+  "productName": "LensCraft",
+  "version": "1.0.0",
+  "description": "LensCraft — Pro Manual & Film Simulation Camera with Leica EXIF Frame, Live RGB Histogram, Focus Peaking, and Native Android DCIM Bridge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/prepare-dist.mjs",
+    "setup:android": "node scripts/setup-android.mjs"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}
